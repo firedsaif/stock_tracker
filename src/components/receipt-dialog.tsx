@@ -45,6 +45,10 @@ export function ReceiptDialog({
               <span className="text-slate-500">Transaction ID:</span>
               <span className="text-slate-800 font-semibold text-right">{transaction.id.split('-')[0].toUpperCase()}</span>
             </div>
+            <div className="grid grid-cols-2">
+              <span className="text-slate-500">Processed By:</span>
+              <span className="text-slate-800 font-semibold text-right">{transaction.user_email || 'System'}</span>
+            </div>
             {isSell && (
               <>
                 <div className="grid grid-cols-2">

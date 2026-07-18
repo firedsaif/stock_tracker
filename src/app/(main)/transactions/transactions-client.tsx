@@ -21,6 +21,7 @@ export type Transaction = {
   total_price: number | null
   product_name: string | null
   product_unit: string | null
+  user_email: string | null
   products: {
     name: string
     unit: string

@@ -21,6 +21,7 @@ export default async function TransactionsPage() {
       total_price,
       product_name,
       product_unit,
+      user_email,
       products (
         name,
         unit
