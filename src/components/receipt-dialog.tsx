@@ -31,7 +31,7 @@ export function ReceiptDialog({
           
           <div className="flex justify-between border-b border-dashed border-slate-300 pb-4">
             <div>
-              <p className="font-bold text-slate-800">STOCK TRACKER CO.</p>
+              <p className="font-bold text-slate-800">JAAD INDUSTRY</p>
               <p className="text-slate-500">Inventory System</p>
             </div>
             <div className="text-right">
@@ -93,7 +93,7 @@ export function ReceiptDialog({
           )}
 
           <div className="text-center text-slate-400 text-xs pt-4">
-            Thank you for using Stock Tracker
+            Thank you for using JAAD INDUSTRY
           </div>
         </div>
         

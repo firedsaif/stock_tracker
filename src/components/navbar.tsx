@@ -14,7 +14,7 @@ export async function Navbar() {
       <div className="flex h-16 items-center px-4 md:px-6">
         <div className="flex items-center gap-2 font-bold text-xl mr-6">
           <Package className="h-6 w-6" />
-          <span>Stock Tracker</span>
+          <span>JAAD INDUSTRY</span>
         </div>
         <div className="flex items-center space-x-4 flex-1">
           <Link
