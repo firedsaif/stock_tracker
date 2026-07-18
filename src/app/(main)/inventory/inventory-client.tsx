@@ -168,7 +168,7 @@ export function InventoryClient({ initialProducts, userRole }: { initialProducts
                             <ArrowDown className="h-3 w-3" />
                             <span className="hidden sm:inline">Sell</span>
                           </Button>
-                          <form action={deleteProduct} onSubmit={(e) => { if(!confirm('Are you sure you want to completely remove this product and all its history?')) e.preventDefault() }}>
+                          <form action={async (formData) => { await deleteProduct(formData) }} onSubmit={(e) => { if(!confirm('Are you sure you want to completely remove this product and all its history?')) e.preventDefault() }}>
                             <input type="hidden" name="product_id" value={product.id} />
                             <Button 
                               type="submit"

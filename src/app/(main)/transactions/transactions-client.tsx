@@ -107,7 +107,7 @@ export function TransactionsClient({ transactions, userRole }: { transactions: T
                       <td className="px-4 sm:px-6 py-4 text-right whitespace-nowrap">
                         <div className="flex justify-end gap-2">
                           <form 
-                            action={deleteTransaction} 
+                            action={async (formData) => { await deleteTransaction(formData) }} 
                             onClick={(e) => e.stopPropagation()} 
                             onSubmit={(e) => { if(!confirm('Are you sure you want to completely remove this transaction log?')) e.preventDefault() }}
                           >
