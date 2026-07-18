@@ -82,7 +82,7 @@ export default async function TeamPage() {
                                 {currentUserRole === 'SUPER_OWNER' && (
                                   <>
                                     {user.role === 'MEMBER' && (
-                                      <form action={promoteToOwner}>
+                                      <form action={async (formData) => { 'use server'; await promoteToOwner(formData) }}>
                                         <input type="hidden" name="userId" value={user.id} />
                                         <Button type="submit" variant="outline" size="sm" className="h-8">
                                           Make Owner
@@ -91,13 +91,13 @@ export default async function TeamPage() {
                                     )}
                                     {user.role === 'OWNER' && (
                                       <>
-                                        <form action={demoteToMember}>
+                                        <form action={async (formData) => { 'use server'; await demoteToMember(formData) }}>
                                           <input type="hidden" name="userId" value={user.id} />
                                           <Button type="submit" variant="outline" size="sm" className="h-8">
                                             Make Member
                                           </Button>
                                         </form>
-                                        <form action={transferSuperOwner}>
+                                        <form action={async (formData) => { 'use server'; await transferSuperOwner(formData) }}>
                                           <input type="hidden" name="userId" value={user.id} />
                                           <Button type="submit" variant="outline" size="sm" className="h-8 border-purple-200 text-purple-700 hover:bg-purple-50">
                                             Transfer Super Owner
@@ -105,7 +105,7 @@ export default async function TeamPage() {
                                         </form>
                                       </>
                                     )}
-                                    <form action={removeMember}>
+                                    <form action={async (formData) => { 'use server'; await removeMember(formData) }}>
                                       <input type="hidden" name="userId" value={user.id} />
                                       <input type="hidden" name="targetRole" value={user.role} />
                                       <Button type="submit" variant="destructive" size="sm" className="h-8">
@@ -116,7 +116,7 @@ export default async function TeamPage() {
                                 )}
                                 
                                 {currentUserRole === 'OWNER' && user.role === 'MEMBER' && (
-                                  <form action={removeMember}>
+                                  <form action={async (formData) => { 'use server'; await removeMember(formData) }}>
                                     <input type="hidden" name="userId" value={user.id} />
                                     <input type="hidden" name="targetRole" value={user.role} />
                                     <Button type="submit" variant="destructive" size="sm" className="h-8">
