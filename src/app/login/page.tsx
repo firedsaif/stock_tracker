@@ -1,4 +1,4 @@
-import { login, signup } from './actions'
+import { login } from './actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -17,7 +17,7 @@ export default async function LoginPage({
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">JAAD INDUSTRY</CardTitle>
           <CardDescription className="text-center">
-            Login or create an account to manage your inventory.
+            Login to manage your inventory.
           </CardDescription>
         </CardHeader>
         <CardContent>
