@@ -30,10 +30,8 @@ export function FinanceClient({ balance, expenses, userRole }: { balance: number
           <p className="text-slate-500 mt-1">Manage your company balance and track miscellaneous expenses.</p>
         </div>
         <Dialog open={isAddExpenseOpen} onOpenChange={setIsAddExpenseOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-slate-900 text-white hover:bg-slate-800">
-              <Plus className="mr-2 h-4 w-4" /> Add Expense
-            </Button>
+          <DialogTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 bg-slate-900 text-white hover:bg-slate-800">
+            <Plus className="mr-2 h-4 w-4" /> Add Expense
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
