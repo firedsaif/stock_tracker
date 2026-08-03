@@ -87,19 +87,36 @@ export function InventoryClient({ initialProducts, userRole }: { initialProducts
                     <Input id="unit" name="unit" defaultValue="Pieces" required />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="stock">Initial Stock</Label>
-                    <Input id="stock" name="stock" type="number" min="0" defaultValue="0" required />
+                    <Label htmlFor="price">Selling Price (per unit)</Label>
+                    <Input id="price" name="price" type="number" step="0.01" min="0" required />
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="low_stock_limit">Low Stock Limit</Label>
-                    <Input id="low_stock_limit" name="low_stock_limit" type="number" min="0" defaultValue="20" required />
+
+                <div className="pt-4 border-t border-slate-100">
+                  <h4 className="text-sm font-medium text-slate-700 mb-4">Initial Stock Details (Optional)</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="stock">Initial Quantity</Label>
+                      <Input id="stock" name="stock" type="number" min="0" defaultValue="0" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="unit_cost">Cost Price (per unit)</Label>
+                      <Input id="unit_cost" name="unit_cost" type="number" step="0.01" min="0" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="vendor_name">Vendor Name</Label>
+                      <Input id="vendor_name" name="vendor_name" placeholder="Supplier name" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="vendor_contact">Vendor Contact</Label>
+                      <Input id="vendor_contact" name="vendor_contact" placeholder="Phone or email" />
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="price">Price (RS) per Unit</Label>
-                    <Input id="price" name="price" type="number" min="0" step="0.01" defaultValue="0" required />
-                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="low_stock_limit">Low Stock Limit</Label>
+                  <Input id="low_stock_limit" name="low_stock_limit" type="number" min="0" defaultValue="20" required />
                 </div>
                 <Button type="submit" className="w-full">Save Product</Button>
               </form>
@@ -219,19 +236,34 @@ export function InventoryClient({ initialProducts, userRole }: { initialProducts
                 <p className="text-xs text-muted-foreground">Available: {selectedProduct?.stock} {selectedProduct?.unit} | Price: RS {selectedProduct?.price}</p>
               )}
             </div>
-            {transactionType === 'SELL' && (
+            {transactionType === 'ADD' ? (
               <>
                 <div className="space-y-2">
-                  <Label htmlFor="sold_to">Sold To (Customer Name)</Label>
-                  <Input id="sold_to" name="sold_to" placeholder="John Doe" required />
+                  <Label htmlFor="unit_cost">Cost Price (per unit)</Label>
+                  <Input id="unit_cost" name="unit_cost" type="number" step="0.01" min="0" placeholder="e.g. 5.00" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="vendor_name">Vendor Name</Label>
+                  <Input id="vendor_name" name="vendor_name" placeholder="Supplier name" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="vendor_contact">Vendor Contact</Label>
+                  <Input id="vendor_contact" name="vendor_contact" placeholder="Phone or email" />
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="sold_to">Sold To / Customer</Label>
+                  <Input id="sold_to" name="sold_to" placeholder="Customer name" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="contact">Contact Details</Label>
-                  <Input id="contact" name="contact" placeholder="Phone or Email" required />
+                  <Input id="contact" name="contact" placeholder="Phone or email" />
                 </div>
               </>
             )}
-            <div className="space-y-2">
+            <div className="space-y-2 md:col-span-2">
               <Label htmlFor="notes">Notes (Optional)</Label>
               <Input id="notes" name="notes" placeholder={transactionType === 'ADD' ? 'e.g., Restock from supplier X' : 'e.g., Additional notes'} />
             </div>

@@ -51,6 +51,10 @@ export async function addProduct(formData: FormData) {
   const initialStock = parseInt(formData.get('stock') as string) || 0
   const lowStockLimit = parseInt(formData.get('low_stock_limit') as string) || 20
   const price = parseFloat(formData.get('price') as string) || 0
+  
+  const vendorName = formData.get('vendor_name') as string || null
+  const vendorContact = formData.get('vendor_contact') as string || null
+  const unitCost = parseFloat(formData.get('unit_cost') as string) || null
 
   const { data, error } = await supabase
     .from('products')
@@ -72,6 +76,8 @@ export async function addProduct(formData: FormData) {
   }
 
   if (initialStock > 0 && data && data.length > 0) {
+    const totalCost = unitCost ? (unitCost * initialStock) : 0;
+    
     // Record initial stock transaction
     await supabase.from('transactions').insert([{
       product_id: data[0].id,
@@ -80,12 +86,35 @@ export async function addProduct(formData: FormData) {
       type: 'ADD',
       quantity: initialStock,
       notes: 'Initial stock',
+      vendor_name: vendorName,
+      vendor_contact: vendorContact,
+      unit_cost: unitCost,
       user_id: user.id,
       user_email: user.email
     }])
+    
+    // Deduct from Company Balance
+    if (totalCost > 0) {
+      const { data: balanceData } = await supabase
+        .from('company_balance')
+        .select('balance')
+        .eq('id', 1)
+        .single()
+        
+      if (balanceData) {
+        await supabase
+          .from('company_balance')
+          .update({ 
+            balance: balanceData.balance - totalCost,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', 1)
+      }
+    }
   }
 
   revalidatePath('/inventory')
+  revalidatePath('/finance')
   revalidatePath('/')
   return { success: true }
 }
@@ -105,8 +134,15 @@ export async function processTransaction(formData: FormData) {
   const type = formData.get('type') as 'ADD' | 'SELL'
   const quantity = parseInt(formData.get('quantity') as string)
   const notes = formData.get('notes') as string
+  
+  // Sell details
   const soldTo = formData.get('sold_to') as string || null
   const contact = formData.get('contact') as string || null
+  
+  // Vendor details (for ADD)
+  const vendorName = formData.get('vendor_name') as string || null
+  const vendorContact = formData.get('vendor_contact') as string || null
+  const unitCost = parseFloat(formData.get('unit_cost') as string) || null
 
   if (!quantity || quantity <= 0) {
     return { error: 'Quantity must be greater than 0' }
@@ -131,15 +167,13 @@ export async function processTransaction(formData: FormData) {
     ? product.stock + quantity 
     : product.stock - quantity
 
-  // For ADD transactions we usually don't set unit_price and total_price unless it's a purchase from a supplier.
-  // The user wants receipt for SELL. So we will set these primarily for SELL.
-  // But setting it for ADD is fine too if we consider `price` the selling price, but we'll leave them null for ADD.
   const isSell = type === 'SELL';
   const unitPrice = isSell ? product.price : null;
   const totalPrice = isSell ? (product.price * quantity) : null;
-
-  // Perform updates in a transaction-like way
   
+  // For ADD transactions, calculate total cost to deduct from company balance
+  const totalCost = (!isSell && unitCost) ? (unitCost * quantity) : 0;
+
   // 1. Update product stock
   const { error: updateError } = await supabase
     .from('products')
@@ -162,6 +196,9 @@ export async function processTransaction(formData: FormData) {
       notes,
       sold_to: isSell ? soldTo : null,
       contact: isSell ? contact : null,
+      vendor_name: !isSell ? vendorName : null,
+      vendor_contact: !isSell ? vendorContact : null,
+      unit_cost: !isSell ? unitCost : null,
       unit_price: unitPrice,
       total_price: totalPrice,
       user_id: user.id,
@@ -169,12 +206,35 @@ export async function processTransaction(formData: FormData) {
     }])
 
   if (txError) {
-    // Ideally we would rollback the stock update here if this fails, but keeping it simple
     console.error('Transaction log failed:', txError)
+  }
+
+  // 3. Update Company Balance
+  const { data: balanceData } = await supabase
+    .from('company_balance')
+    .select('balance')
+    .eq('id', 1)
+    .single()
+    
+  if (balanceData) {
+    let newBalance = balanceData.balance
+    if (isSell && totalPrice) {
+      newBalance += totalPrice
+    } else if (!isSell && totalCost > 0) {
+      newBalance -= totalCost
+    }
+    
+    if (newBalance !== balanceData.balance) {
+      await supabase
+        .from('company_balance')
+        .update({ balance: newBalance, updated_at: new Date().toISOString() })
+        .eq('id', 1)
+    }
   }
 
   revalidatePath('/inventory')
   revalidatePath('/transactions')
+  revalidatePath('/finance')
   revalidatePath('/')
   return { success: true }
 }

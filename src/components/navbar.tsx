@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { logout } from '@/app/actions'
 import { Button } from '@/components/ui/button'
-import { Package, LayoutDashboard, History, LogOut, Users, Trash2 } from 'lucide-react'
+import { Package, LayoutDashboard, History, LogOut, Users, Trash2, Wallet, UserCheck, Trash } from 'lucide-react'
 import { getUserRole } from '@/utils/roles'
 import { deleteMyAccount } from '@/app/actions'
 
@@ -46,6 +46,27 @@ export async function Navbar() {
               >
                 <Users className="h-4 w-4" />
                 <span className="hidden sm:inline">Team</span>
+              </Link>
+              <Link
+                href="/attendance"
+                className="text-sm font-medium transition-colors hover:text-primary flex items-center gap-2"
+              >
+                <UserCheck className="h-4 w-4" />
+                <span className="hidden lg:inline">Attendance</span>
+              </Link>
+              <Link
+                href="/finance"
+                className="text-sm font-medium transition-colors hover:text-primary flex items-center gap-2"
+              >
+                <Wallet className="h-4 w-4" />
+                <span className="hidden lg:inline">Finance</span>
+              </Link>
+              <Link
+                href="/recycle-bin"
+                className="text-sm font-medium transition-colors hover:text-primary flex items-center gap-2"
+              >
+                <Trash className="h-4 w-4" />
+                <span className="hidden lg:inline">Recycle Bin</span>
               </Link>
             </>
           )}
