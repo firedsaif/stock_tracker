@@ -15,12 +15,11 @@ export async function markAttendance(formData: FormData) {
     return { error: 'Members cannot mark attendance' }
   }
 
-  const userId = formData.get('user_id') as string
-  const userEmail = formData.get('user_email') as string
+  const employeeId = formData.get('employee_id') as string
   const status = formData.get('status') as 'PRESENT' | 'ABSENT' | 'LEAVE'
   const date = formData.get('date') as string // YYYY-MM-DD format
 
-  if (!userId || !userEmail || !status || !date) {
+  if (!employeeId || !status || !date) {
     return { error: 'Missing required fields' }
   }
 
@@ -28,13 +27,12 @@ export async function markAttendance(formData: FormData) {
   const { error } = await supabase
     .from('attendance')
     .upsert({
-      user_id: userId,
-      user_email: userEmail,
+      employee_id: employeeId,
       date: date,
       status: status,
       marked_by: user.id
     }, {
-      onConflict: 'user_id,date'
+      onConflict: 'employee_id,date'
     })
 
   if (error) {

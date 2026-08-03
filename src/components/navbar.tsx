@@ -5,6 +5,8 @@ import { Package, LayoutDashboard, History, LogOut, Users, Trash2, Wallet, UserC
 import { getUserRole } from '@/utils/roles'
 import { deleteMyAccount } from '@/app/actions'
 
+import { MobileMenu } from './mobile-menu'
+
 export async function Navbar() {
   const { role } = await getUserRole()
   const canManage = role === 'SUPER_OWNER' || role === 'OWNER'
@@ -12,24 +14,28 @@ export async function Navbar() {
   return (
     <nav className="border-b bg-white">
       <div className="flex h-16 items-center px-4 md:px-6">
-        <div className="flex items-center gap-2 font-bold text-xl mr-6">
+        <MobileMenu canManage={canManage} />
+        
+        <div className="flex items-center gap-2 font-bold text-xl mr-6 ml-2 lg:ml-0">
           <Package className="h-6 w-6" />
-          <span>JAAD INDUSTRY</span>
+          <span className="hidden sm:inline">JAAD INDUSTRY</span>
         </div>
-        <div className="flex items-center space-x-4 flex-1">
+        
+        {/* Desktop Links */}
+        <div className="hidden lg:flex items-center space-x-4 flex-1">
           <Link
             href="/"
             className="text-sm font-medium transition-colors hover:text-primary flex items-center gap-2"
           >
             <LayoutDashboard className="h-4 w-4" />
-            <span className="hidden sm:inline">Dashboard</span>
+            <span>Dashboard</span>
           </Link>
           <Link
             href="/inventory"
             className="text-sm font-medium transition-colors hover:text-primary flex items-center gap-2"
           >
             <Package className="h-4 w-4" />
-            <span className="hidden sm:inline">Inventory</span>
+            <span>Inventory</span>
           </Link>
           {canManage && (
             <>
@@ -38,39 +44,47 @@ export async function Navbar() {
                 className="text-sm font-medium transition-colors hover:text-primary flex items-center gap-2"
               >
                 <History className="h-4 w-4" />
-                <span className="hidden sm:inline">History</span>
+                <span>History</span>
               </Link>
               <Link
                 href="/team"
                 className="text-sm font-medium transition-colors hover:text-primary flex items-center gap-2"
               >
                 <Users className="h-4 w-4" />
-                <span className="hidden sm:inline">Team</span>
+                <span>Owners</span>
+              </Link>
+              <Link
+                href="/employees"
+                className="text-sm font-medium transition-colors hover:text-primary flex items-center gap-2"
+              >
+                <Users className="h-4 w-4" />
+                <span>Employees</span>
               </Link>
               <Link
                 href="/attendance"
                 className="text-sm font-medium transition-colors hover:text-primary flex items-center gap-2"
               >
                 <UserCheck className="h-4 w-4" />
-                <span className="hidden lg:inline">Attendance</span>
+                <span>Attendance</span>
               </Link>
               <Link
                 href="/finance"
                 className="text-sm font-medium transition-colors hover:text-primary flex items-center gap-2"
               >
                 <Wallet className="h-4 w-4" />
-                <span className="hidden lg:inline">Finance</span>
+                <span>Finance</span>
               </Link>
               <Link
                 href="/recycle-bin"
                 className="text-sm font-medium transition-colors hover:text-primary flex items-center gap-2"
               >
                 <Trash className="h-4 w-4" />
-                <span className="hidden lg:inline">Recycle Bin</span>
+                <span>Recycle Bin</span>
               </Link>
             </>
           )}
         </div>
+
         <div className="ml-auto flex items-center space-x-2 sm:space-x-4">
           <form action={deleteMyAccount}>
             <Button variant="ghost" size="sm" className="gap-2 text-red-600 hover:text-red-700 hover:bg-red-50">

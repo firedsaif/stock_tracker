@@ -19,19 +19,14 @@ export default async function AttendancePage({
   // Use today's date if none provided
   const targetDate = date || new Date().toISOString().split('T')[0]
 
-  // We need a list of all users to mark attendance.
-  // We can fetch from auth.users if super owner, but team members can be fetched securely using an RPC or getting all profiles.
-  // Wait, Supabase auth.users is admin-only. We don't have a public users table.
-  // Let's use the Supabase admin client to fetch all users like we do in Team page.
-  const { createClient: createAdminClient } = await import('@supabase/supabase-js')
-  const supabaseAdmin = createAdminClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  // Fetch employees
+  const { data: employeesData, error: employeesError } = await supabase
+    .from('employees')
+    .select('*')
+    .order('name', { ascending: true })
 
-  const { data: usersData, error: usersError } = await supabaseAdmin.auth.admin.listUsers()
-  if (usersError) {
-    return <div>Error loading users.</div>
+  if (employeesError) {
+    return <div>Error loading employees.</div>
   }
 
   // Fetch attendance records for the target date
@@ -46,7 +41,7 @@ export default async function AttendancePage({
 
   return (
     <AttendanceClient 
-      users={usersData.users || []} 
+      employees={employeesData || []} 
       attendanceRecords={attendanceRecords || []} 
       currentDate={targetDate} 
     />

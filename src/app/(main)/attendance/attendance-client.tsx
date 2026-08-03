@@ -9,25 +9,25 @@ import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
-export type User = {
+export type Employee = {
   id: string
-  email?: string
+  name: string
+  cnic: string
 }
 
 export type AttendanceRecord = {
   id: string
-  user_id: string
-  user_email: string
+  employee_id: string
   date: string
   status: 'PRESENT' | 'ABSENT' | 'LEAVE'
 }
 
 export function AttendanceClient({ 
-  users, 
+  employees, 
   attendanceRecords, 
   currentDate 
 }: { 
-  users: User[], 
+  employees: Employee[], 
   attendanceRecords: AttendanceRecord[],
   currentDate: string
 }) {
@@ -41,8 +41,8 @@ export function AttendanceClient({
     router.push(`/attendance?date=${newDate}`)
   }
 
-  const getRecordForUser = (userId: string) => {
-    return attendanceRecords.find((record) => record.user_id === userId)
+  const getRecordForEmployee = (employeeId: string) => {
+    return attendanceRecords.find((record) => record.employee_id === employeeId)
   }
 
   return (
@@ -72,18 +72,19 @@ export function AttendanceClient({
             <table className="w-full text-sm text-left">
               <thead className="text-xs text-slate-500 uppercase bg-slate-50">
                 <tr>
-                  <th className="px-6 py-4 font-semibold">Employee Email</th>
+                  <th className="px-6 py-4 font-semibold">Employee Name</th>
                   <th className="px-6 py-4 font-semibold text-center">Status</th>
                   <th className="px-6 py-4 font-semibold text-center">Mark Attendance</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {users.map((user) => {
-                  const record = getRecordForUser(user.id)
+                {employees.map((emp) => {
+                  const record = getRecordForEmployee(emp.id)
                   return (
-                    <tr key={user.id} className="hover:bg-slate-50/80 transition-colors">
+                    <tr key={emp.id} className="hover:bg-slate-50/80 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap font-medium text-slate-900">
-                        {user.email}
+                        {emp.name}
+                        <div className="text-xs text-slate-500 font-normal">{emp.cnic}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center">
                         {record ? (
@@ -103,12 +104,11 @@ export function AttendanceClient({
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center justify-center gap-2">
                           <form action={async (formData) => {
-                            setLoadingId(user.id + '-PRESENT')
+                            setLoadingId(emp.id + '-PRESENT')
                             await markAttendance(formData)
                             setLoadingId(null)
                           }}>
-                            <input type="hidden" name="user_id" value={user.id} />
-                            <input type="hidden" name="user_email" value={user.email || ''} />
+                            <input type="hidden" name="employee_id" value={emp.id} />
                             <input type="hidden" name="status" value="PRESENT" />
                             <input type="hidden" name="date" value={date} />
                             <Button 
@@ -123,12 +123,11 @@ export function AttendanceClient({
                           </form>
 
                           <form action={async (formData) => {
-                            setLoadingId(user.id + '-ABSENT')
+                            setLoadingId(emp.id + '-ABSENT')
                             await markAttendance(formData)
                             setLoadingId(null)
                           }}>
-                            <input type="hidden" name="user_id" value={user.id} />
-                            <input type="hidden" name="user_email" value={user.email || ''} />
+                            <input type="hidden" name="employee_id" value={emp.id} />
                             <input type="hidden" name="status" value="ABSENT" />
                             <input type="hidden" name="date" value={date} />
                             <Button 
@@ -143,12 +142,11 @@ export function AttendanceClient({
                           </form>
 
                           <form action={async (formData) => {
-                            setLoadingId(user.id + '-LEAVE')
+                            setLoadingId(emp.id + '-LEAVE')
                             await markAttendance(formData)
                             setLoadingId(null)
                           }}>
-                            <input type="hidden" name="user_id" value={user.id} />
-                            <input type="hidden" name="user_email" value={user.email || ''} />
+                            <input type="hidden" name="employee_id" value={emp.id} />
                             <input type="hidden" name="status" value="LEAVE" />
                             <input type="hidden" name="date" value={date} />
                             <Button 
