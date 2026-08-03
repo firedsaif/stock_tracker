@@ -3,12 +3,12 @@
 import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { format } from 'date-fns'
-import { Plus, Wallet, Receipt, TrendingDown } from 'lucide-react'
+import { Plus, Wallet, Receipt, TrendingDown, Edit2, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { addExpense } from './actions'
+import { addExpense, setInitialBalance, deleteExpense } from './actions'
 
 export type Expense = {
   id: string
@@ -20,7 +20,9 @@ export type Expense = {
 
 export function FinanceClient({ balance, expenses, userRole }: { balance: number, expenses: Expense[], userRole: string | null }) {
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false)
+  const [isUpdateBalanceOpen, setIsUpdateBalanceOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [loadingId, setLoadingId] = useState<string | null>(null)
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto p-4 sm:p-6">
@@ -61,11 +63,36 @@ export function FinanceClient({ balance, expenses, userRole }: { balance: number
 
       <div className="grid gap-4 md:grid-cols-3">
         <Card className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white border-0 shadow-lg md:col-span-1">
-          <CardHeader className="pb-2">
+          <CardHeader className="pb-2 flex flex-row items-center justify-between">
             <CardTitle className="text-indigo-100 text-sm font-medium uppercase tracking-wider flex items-center gap-2">
               <Wallet className="h-4 w-4" />
               Company Balance
             </CardTitle>
+            <Dialog open={isUpdateBalanceOpen} onOpenChange={setIsUpdateBalanceOpen}>
+              <DialogTrigger className="text-indigo-100 hover:text-white p-1 rounded-full hover:bg-indigo-400/30 transition-colors">
+                <Edit2 className="h-4 w-4" />
+                <span className="sr-only">Update Balance</span>
+              </DialogTrigger>
+              <DialogContent className="text-slate-900">
+                <DialogHeader>
+                  <DialogTitle>Set Current Balance</DialogTitle>
+                </DialogHeader>
+                <form action={async (formData) => {
+                  setLoading(true)
+                  await setInitialBalance(formData)
+                  setLoading(false)
+                  setIsUpdateBalanceOpen(false)
+                }} className="space-y-4 pt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="balance">Current Balance (RS)</Label>
+                    <Input id="balance" name="balance" type="number" step="0.01" defaultValue={balance} required />
+                  </div>
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    {loading ? 'Updating...' : 'Update Balance'}
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
           </CardHeader>
           <CardContent>
             <div className="text-4xl font-bold">
@@ -95,6 +122,7 @@ export function FinanceClient({ balance, expenses, userRole }: { balance: number
                   <th className="px-6 py-4 font-semibold">Reason</th>
                   <th className="px-6 py-4 font-semibold">Recorded By</th>
                   <th className="px-6 py-4 font-semibold text-right">Amount (RS)</th>
+                  <th className="px-6 py-4 font-semibold text-center w-16">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -119,6 +147,25 @@ export function FinanceClient({ balance, expenses, userRole }: { balance: number
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right font-medium text-red-600">
                         - {expense.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center">
+                        <form action={async (formData) => {
+                          if (window.confirm('Are you sure you want to delete this expense? The amount will be refunded to your balance.')) {
+                            setLoadingId(expense.id)
+                            await deleteExpense(formData)
+                            setLoadingId(null)
+                          }
+                        }}>
+                          <input type="hidden" name="expense_id" value={expense.id} />
+                          <button 
+                            type="submit" 
+                            className="text-slate-400 hover:text-red-600 p-1 rounded transition-colors disabled:opacity-50"
+                            title="Delete Expense"
+                            disabled={loadingId === expense.id}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </form>
                       </td>
                     </tr>
                   ))

@@ -59,3 +59,89 @@ export async function addExpense(formData: FormData) {
   revalidatePath('/finance')
   return { success: true }
 }
+
+export async function setInitialBalance(formData: FormData) {
+  const supabase = await createClient()
+  
+  const { role } = await getUserRole()
+  if (role !== 'SUPER_OWNER' && role !== 'OWNER') {
+    return { error: 'Members cannot update balance' }
+  }
+
+  const newBalance = parseFloat(formData.get('balance') as string)
+  if (isNaN(newBalance)) {
+    return { error: 'Invalid balance amount' }
+  }
+
+  const { error } = await supabase
+    .from('company_balance')
+    .update({ 
+      balance: newBalance,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', 1)
+
+  if (error) {
+    console.error('Error setting balance:', error)
+    return { error: error.message }
+  }
+
+  revalidatePath('/finance')
+  return { success: true }
+}
+
+export async function deleteExpense(formData: FormData) {
+  const supabase = await createClient()
+  
+  const { role } = await getUserRole()
+  if (role !== 'SUPER_OWNER' && role !== 'OWNER') {
+    return { error: 'Members cannot delete expenses' }
+  }
+
+  const expenseId = formData.get('expense_id') as string
+  if (!expenseId) {
+    return { error: 'Expense ID required' }
+  }
+
+  // Fetch the expense to get its amount so we can restore the balance
+  const { data: expense, error: fetchError } = await supabase
+    .from('expenses')
+    .select('amount')
+    .eq('id', expenseId)
+    .single()
+
+  if (fetchError || !expense) {
+    return { error: 'Expense not found' }
+  }
+
+  // Delete the expense
+  const { error: deleteError } = await supabase
+    .from('expenses')
+    .delete()
+    .eq('id', expenseId)
+
+  if (deleteError) {
+    console.error('Error deleting expense:', deleteError)
+    return { error: deleteError.message }
+  }
+
+  // Restore the balance
+  const { data: balanceData } = await supabase
+    .from('company_balance')
+    .select('balance')
+    .eq('id', 1)
+    .single()
+    
+  if (balanceData) {
+    await supabase
+      .from('company_balance')
+      .update({ 
+        balance: balanceData.balance + expense.amount,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', 1)
+  }
+
+  revalidatePath('/finance')
+  return { success: true }
+}
