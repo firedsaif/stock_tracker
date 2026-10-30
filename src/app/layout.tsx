@@ -1,24 +1,16 @@
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Mono, IBM_Plex_Sans, IBM_Plex_Sans_Condensed } from "next/font/google";
+// Fonts are bundled (not fetched from Google at build time) so builds never
+// depend on a font download.
+import "@fontsource/ibm-plex-sans/latin-400.css";
+import "@fontsource/ibm-plex-sans/latin-500.css";
+import "@fontsource/ibm-plex-sans/latin-600.css";
+import "@fontsource/ibm-plex-sans-condensed/latin-500.css";
+import "@fontsource/ibm-plex-sans-condensed/latin-600.css";
+import "@fontsource/ibm-plex-sans-condensed/latin-700.css";
+import "@fontsource/ibm-plex-mono/latin-400.css";
+import "@fontsource/ibm-plex-mono/latin-500.css";
+import "@fontsource/ibm-plex-mono/latin-600.css";
 import "./globals.css";
-
-const plexSans = IBM_Plex_Sans({
-  variable: "--font-plex-sans",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-});
-
-const plexCondensed = IBM_Plex_Sans_Condensed({
-  variable: "--font-plex-condensed",
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
-});
-
-const plexMono = IBM_Plex_Mono({
-  variable: "--font-plex-mono",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-});
 
 export const metadata: Metadata = {
   title: { default: "Stock Khata", template: "%s · Stock Khata" },
@@ -41,10 +33,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${plexSans.variable} ${plexCondensed.variable} ${plexMono.variable} h-full antialiased`}
-    >
+    <html lang="en" className="h-full antialiased">
       <body className="min-h-full">{children}</body>
     </html>
   );

@@ -9,6 +9,10 @@
   account-book margin and the primary action, green ink for stock coming in.
 */
 :root {
+  --font-plex-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-plex-condensed: "IBM Plex Sans Condensed", "IBM Plex Sans", ui-sans-serif, sans-serif;
+  --font-plex-mono: "IBM Plex Mono", ui-monospace, monospace;
+
   --paper: #f2f4f6;
   --sheet: #ffffff;
   --ink: #1b2430;
