@@ -1,16 +1,10 @@
-import { Navbar } from '@/components/navbar'
+import { Nav } from '@/components/nav'
 
-export default function MainLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <Navbar />
-      <main className="flex-1 p-4 md:p-6 lg:p-8 max-w-7xl mx-auto w-full">
-        {children}
-      </main>
+    <div className="md:pl-56">
+      <Nav />
+      <main className="mx-auto w-full max-w-3xl pb-32 pt-5 md:px-8 md:pb-16 md:pt-10">{children}</main>
     </div>
   )
 }
